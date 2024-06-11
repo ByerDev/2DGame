@@ -2,8 +2,10 @@ import math
 import sys
 import os
 from time import sleep
+import PIL.PyAccess
 import cursor
-from PIL import Image, ImagePalette
+from PIL import Image
+import PIL
 
 class Graphics:
     """The class to draw stuff to the terminal window
@@ -95,42 +97,49 @@ class Graphics:
         for y in range(len(self.pixelbuffer)):
             self.pixelbuffer[y][x] = on
             
-    def drawSprite(self, sprite: list[list[bool]], x: int, y:int):
+    def drawSprite(self, sprite: Image.Image, x: int, y:int):
         """Draw a "sprite" to the specified position.\nNote: The position determines the top left corner of the sprite
 
         Args:
-            sprite (list[list[bool]]): _description_
+            sprite (Image.Image): The sprite generated from Graphics.genSpriteFromImage
             x (int): x-position
             y (int): y-position
         """
         
-        for l in range(len(sprite)):
-            for p in range(len(sprite[0])):
-                self.pixelbuffer[l+y][p+x] = sprite[l][p]
-
+        dim = sprite.size
+        px = sprite.load()
+        
+        for l in range(dim[1]):
+            for p in range(dim[0]):
+                value = bool(round(sum(px[p, l])/3/256)) # Issue in here somewhere
+                self.drawPixel(p+x,l+y, value)
     
     def endDraw(self) -> None:
         os.system("clear")
         cursor.show()
     
     
-    def genSpriteFromImage(image_path: str) -> list[list[int]]:
+    def genSpriteFromImage(image_path: str) -> Image.Image:
+        """Generate a Sprite from an Image
+
+        Args:
+            image_path (str): The path to the image
+
+        Returns:
+            Image.Image: 
+        """
+        
         im = Image.open(image_path)
-        dim = im.size
-        px = im.load()
         
-        out = []
-        
-        for y in range(dim[0]):
-            line = []
-            for x in range(dim[1]):
-                line.append(round(sum(px[x, y][:2])/3/255))
-            out.append(line)
-        
-        return out
+        return im
             
 
 if __name__ == "__main__":
     graphics = Graphics(100)
+    sleep(1)
+    graphics.clearScreen()
+    testSprite = Graphics.genSpriteFromImage("/home/arved/Documents/Untitled.png")
+    graphics.drawSprite(testSprite, 0, 0)
+    graphics.drawFrame()
     sleep(1)
     graphics.endDraw()
