@@ -1,12 +1,13 @@
 import math
 import sys
-
-nl = "\n" # Newline for use in f-Strings
+import os
+import time
+import cursor
 
 class Graphics:
     """The class to draw stuff to the terminal window
     """
-    def __init__(self, window_size: int):
+    def __init__(self, window_size: int) -> None:
         """__init__
 
         Args:
@@ -15,16 +16,88 @@ class Graphics:
         
         self.window_resolution = [window_size,math.floor(window_size/2)] # Set the actual resolution with a 2:1 Aspect Ratio (because I said so)
         
-        self.pixelbuffer = []
+        self.textbuffer = []
         
-        # screen borders
-        self.pixelbuffer.append(self.window_resolution[0]*"■ ")
-        self.pixelbuffer += ["■"+(self.window_resolution[0]-2)*"  "+" "+"■"]*(self.window_resolution[1]-2) # The inner part of the screen resolution display
-        self.pixelbuffer.append(self.pixelbuffer[0])
-        sys.stdout.write("\n".join(self.pixelbuffer))
+        self.pixelbuffer = []
+        self.clearScreen()
+        
+        sys.stdout.write("test\n")
+        cursor.hide()
+        
+        self.drawRow(0, True)
+        self.drawRow(self.window_resolution[1]-1, True)
+        self.drawColumn(0, True)
+        self.drawColumn(self.window_resolution[0]-1, True)
+        self.drawFrame()
+        
     def clearScreen(self) -> None:
         """Clears the pixel buffer"""
-        self.pixelbuffer = []
+        self.pixelbuffer = [[False]*self.window_resolution[0]]*self.window_resolution[1]
+
+    def drawFrame(self, pixelbuffer:list[str] = None) -> None:
+        """Draw the pixelbuffer to screen
+
+        Args:
+            pixelbuffer (list[str], optional): Optionally draw a self-made pixel buffer and save it internally. Defaults to None.
+        """
+        
+        if pixelbuffer == None:
+            usedPixelBuffer = self.pixelbuffer
+        else:
+            usedPixelBuffer = pixelbuffer
+        
+        
+        out = []
+        for l in range(len(usedPixelBuffer)):
+            line = ""
+            for p in range(self.window_resolution[0]):
+                # Add a pixel to the line, if the value in the buffer is true, draw a square, otherwise don't. Then add a space to space the line out in accordance to the vertical space.
+                if usedPixelBuffer[l][p]:
+                    line += "■"
+                else:
+                    line += " "
+                line += " "
+            out.append(line)
+        
+        os.system("clear")
+        sys.stdout.write("\n".join(out))
+    
+    def drawPixel(self, x: int, y: int, on: bool) -> None:
+        """Draw a Pixel at the specified coordinates
+
+        Args:
+            x (int): x-coordinate
+            y (int): y-coordinate
+            on (bool): draw white (true) or black (false)
+        """
+        
+        self.pixelbuffer[y][x] = on
+    
+    def drawRow(self, y: int, on: bool) -> None:
+        """Draw an entire row at the same time
+
+        Args:
+            y (int): the y-position
+            on (bool): draw white (true) or black (false)
+        """
+        
+        self.pixelbuffer[y] = self.window_resolution[0]*[on]
+    
+    def drawColumn(self, x: int, on: bool) -> None:
+        """Draw an entire row at the same time
+
+        Args:
+            x (int): the x-position
+            on (bool): draw white (true) or black (false)
+        """
+        
+        for y in range(len(self.pixelbuffer)):
+            self.pixelbuffer[y][x] = on
+    
+    def endDraw(self) -> None:
+        os.system("clear")
+        cursor.show()
 
 if __name__ == "__main__":
     graphics = Graphics(int(sys.argv[1]))
+    graphics.endDraw()
