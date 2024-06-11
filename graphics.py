@@ -1,8 +1,9 @@
 import math
 import sys
 import os
-import time
+from time import sleep
 import cursor
+from PIL import Image, ImagePalette
 
 class Graphics:
     """The class to draw stuff to the terminal window
@@ -93,11 +94,43 @@ class Graphics:
         
         for y in range(len(self.pixelbuffer)):
             self.pixelbuffer[y][x] = on
+            
+    def drawSprite(self, sprite: list[list[bool]], x: int, y:int):
+        """Draw a "sprite" to the specified position.\nNote: The position determines the top left corner of the sprite
+
+        Args:
+            sprite (list[list[bool]]): _description_
+            x (int): x-position
+            y (int): y-position
+        """
+        
+        for l in range(len(sprite)):
+            for p in range(len(sprite[0])):
+                self.pixelbuffer[l+y][p+x] = sprite[l][p]
+
     
     def endDraw(self) -> None:
         os.system("clear")
         cursor.show()
+    
+    
+    def genSpriteFromImage(image_path: str) -> list[list[int]]:
+        im = Image.open(image_path)
+        dim = im.size
+        px = im.load()
+        
+        out = []
+        
+        for y in range(dim[0]):
+            line = []
+            for x in range(dim[1]):
+                line.append(round(sum(px[x, y][:2])/3/255))
+            out.append(line)
+        
+        return out
+            
 
 if __name__ == "__main__":
-    graphics = Graphics(int(sys.argv[1]))
+    graphics = Graphics(100)
+    sleep(1)
     graphics.endDraw()
