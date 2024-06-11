@@ -2,10 +2,8 @@ import math
 import sys
 import os
 from time import sleep
-import PIL.PyAccess
 import cursor
 from PIL import Image
-import PIL
 
 class Graphics:
     """The class to draw stuff to the terminal window
@@ -35,8 +33,7 @@ class Graphics:
         
     def clearScreen(self) -> None:
         """Clears the pixel buffer"""
-        self.pixelbuffer = [[False]*self.window_resolution[0]]*self.window_resolution[1]
-
+        self.pixelbuffer = [[False for _ in range(self.window_resolution[0])][:] for _ in range(self.window_resolution[1])]
     def drawFrame(self, pixelbuffer:list[str] = None) -> None:
         """Draw the pixelbuffer to screen
 
@@ -109,10 +106,10 @@ class Graphics:
         dim = sprite.size
         px = sprite.load()
         
-        for l in range(dim[1]):
-            for p in range(dim[0]):
-                value = bool(round(sum(px[p, l])/3/256)) # Issue in here somewhere
-                self.drawPixel(p+x,l+y, value)
+        for cx in range(dim[1]):
+            for cy in range(dim[0]):
+                value = bool(round(sum(px[cx, cy])/3/256)) # Issue in here somewhere
+                self.drawPixel(cx+x,cy+y, value)
     
     def endDraw(self) -> None:
         os.system("clear")
@@ -132,13 +129,12 @@ class Graphics:
         im = Image.open(image_path)
         
         return im
-            
+
 
 if __name__ == "__main__":
     graphics = Graphics(100)
     sleep(1)
-    graphics.clearScreen()
-    testSprite = Graphics.genSpriteFromImage("/home/arved/Documents/Untitled.png")
+    testSprite = Graphics.genSpriteFromImage(sys.argv[1])
     graphics.drawSprite(testSprite, 0, 0)
     graphics.drawFrame()
     sleep(1)
