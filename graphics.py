@@ -93,7 +93,7 @@ class Graphics:
             self.pixelbuffer[y][x] = on
             
     def drawSprite(self, sprite: Image.Image, x: int, y:int) -> None:
-        """Draw a "sprite" to the specified position.\nNote: The position determines the top left corner of the sprite
+        """Draw a "sprite" to the specified position.
 
         Args:
             sprite (Image.Image): The sprite generated from Graphics.genSpriteFromImage
@@ -107,7 +107,7 @@ class Graphics:
         for cx in range(dim[1]):
             for cy in range(dim[0]):
                 value = bool(round(sum(px[cx, cy])/3/256)) # Issue in here somewhere
-                self.drawPixel(cx+x,cy+y, value)
+                self.drawPixel(cx+(x-dim[0]/2),cy+(y-dim[1]/2), value)
     
     def endDraw(self) -> None:
         os.system("clear")
