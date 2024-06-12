@@ -94,7 +94,7 @@ class Graphics:
         for y in range(len(self.pixelbuffer)):
             self.pixelbuffer[y][x] = on
             
-    def drawSprite(self, sprite: Image.Image, x: int, y:int):
+    def drawSprite(self, sprite: Image.Image, x: int, y:int) -> None:
         """Draw a "sprite" to the specified position.\nNote: The position determines the top left corner of the sprite
 
         Args:
