@@ -132,6 +132,8 @@ class Graphics:
 
 
 if __name__ == "__main__":
+    print("THIS IS ONLY FOR DEBUGGING PURPOSES")
+    input()
     graphics = Graphics(100)
     sleep(1)
     testSprite = Graphics.genSpriteFromImage(sys.argv[1])
