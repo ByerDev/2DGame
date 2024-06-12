@@ -17,8 +17,6 @@ class Graphics:
         
         self.window_resolution = [window_size,math.floor(window_size/2)] # Set the actual resolution with a 2:1 Aspect Ratio (because I said so)
         
-        self.textbuffer = []
-        
         self.pixelbuffer = []
         self.clearScreen()
         
