@@ -17,25 +17,20 @@ class Graphics:
         
         self.window_resolution = [window_size,math.floor(window_size/2)] # Set the actual resolution with a 2:1 Aspect Ratio (because I said so)
         
-        self.spriteBuffer: dict[tuple[str, tuple[int]]] = {} # A buffer for displaying sprites. Format {name: (filename, pos)}
+        self.spriteBuffer: dict[list[str, list[int]]] = {} # A buffer for displaying sprites. Format {name: (filename, pos)}
         
         self.pixelbuffer = []
         self.clearScreen()
         
         sys.stdout.write("test\n")
         cursor.hide()
-        
-        self.drawRow(0, True)
-        self.drawRow(self.window_resolution[1]-1, True)
-        self.drawColumn(0, True)
-        self.drawColumn(self.window_resolution[0]-1, True)
         self.drawFrame()
         
     def clearScreen(self) -> None:
         """Clears the pixel buffer"""
         self.pixelbuffer = [[False for _ in range(self.window_resolution[0])][:] for _ in range(self.window_resolution[1])]
 
-    def drawFrame(self, pixelbuffer:list[bool]|None = None, spritebuffer:dict[dict[tuple[int]]]|None = None) -> None:
+    def drawFrame(self, pixelbuffer:list[bool]|None = None, spritebuffer:dict[dict[list[int]]]|None = None) -> None:
         """Draw the pixelbuffer to screen
 
         Args:
@@ -48,12 +43,13 @@ class Graphics:
             usedPixelBuffer = pixelbuffer
         
         if spritebuffer == None:
-            usedSpriteBuffer: dict[dict[tuple[int]]] = self.spriteBuffer
+            usedSpriteBuffer: dict[dict[list[int]]] = self.spriteBuffer
         else:
-            usedSpriteBuffer: dict[dict[tuple[int]]] = spritebuffer
+            usedSpriteBuffer: dict[dict[list[int]]] = spritebuffer
         
+        self.clearScreen()
         
-        for _, (filename, pos) in usedSpriteBuffer.items():
+        for _, [filename, pos] in usedSpriteBuffer.items():
             self.drawSprite(self.genSpriteFromImage(filename), pos)
         
         out = []
@@ -67,6 +63,11 @@ class Graphics:
                     line += " "
                 line += " "
             out.append(line)
+        
+        self.drawRow(0, True)
+        self.drawRow(self.window_resolution[1]-1, True)
+        self.drawColumn(0, True)
+        self.drawColumn(self.window_resolution[0]-1, True)
         
         os.system("clear")
         sys.stdout.write("\n".join(out))
@@ -103,12 +104,12 @@ class Graphics:
         for y in range(len(self.pixelbuffer)):
             self.pixelbuffer[y][x] = on
             
-    def drawSprite(self, sprite: Image.Image, pos: tuple[int]) -> None:
+    def drawSprite(self, sprite: Image.Image, pos: list[int]) -> None:
         """Draw a "sprite" to the specified position.
 
         Args:
             sprite (Image.Image): The sprite generated from Graphics.genSpriteFromImage
-            pos (tuple[int]): The position of the sprite. The origin is the top left.
+            pos (list[int]): The position of the sprite. The origin is the top left.
         """
         
         dim = sprite.size
@@ -142,23 +143,23 @@ class Graphics:
         
         return im
     
-    def addSprite(self, pos: tuple[int], filename: str, name: str) -> None:
+    def addSprite(self, pos: list[int], filename: str, name: str) -> None:
         """Add a sprite to the spritebuffer
 
         Args:
-            pos (tuple): The position (x,y)
+            pos (list): The position (x,y)
             filename (str): The filename of the RGB image
             name (str): The name of the sprite.
         """
         
-        self.spriteBuffer[name] = (filename, pos)
+        self.spriteBuffer[name] = [filename, pos]
     
-    def editSprite(self, name: str, pos: tuple[int] = None, filename: str = None) -> None:
+    def editSprite(self, name: str, pos: list[int] = None, filename: str = None) -> None:
         """A function for editing a sprites position and/or image
 
         Args:
             name (str): The name of the sprite (NOT the filename)
-            pos (tuple[int], optional): The position. Defaults to None.
+            pos (list[int], optional): The position. Defaults to None.
             filename (str, optional): The filename of the new Image. Defaults to None.
         """
         
@@ -177,6 +178,14 @@ class Graphics:
     
     def getSpriteBuffer(self):
         return self.spriteBuffer
+    
+    def getSprite(self, name: str) -> list[str, list[int]]:
+        """A function for recieving a sprite
+
+        Args:
+            name (str): the name
+        """
+        return self.spriteBuffer[name]
 
 if __name__ == "__main__":
     print("THIS IS ONLY FOR DEBUGGING PURPOSES")
