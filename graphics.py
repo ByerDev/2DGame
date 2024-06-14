@@ -17,6 +17,8 @@ class Graphics:
         
         self.window_resolution = [window_size,math.floor(window_size/2)] # Set the actual resolution with a 2:1 Aspect Ratio (because I said so)
         
+        self.spriteBuffer: dict[dict[tuple[int]]] = {} # A buffer for displaying sprites. Format {filename:[spritename:(x1,y1), spritename:(x2,y2), ...]}
+        
         self.pixelbuffer = []
         self.clearScreen()
         
@@ -32,7 +34,8 @@ class Graphics:
     def clearScreen(self) -> None:
         """Clears the pixel buffer"""
         self.pixelbuffer = [[False for _ in range(self.window_resolution[0])][:] for _ in range(self.window_resolution[1])]
-    def drawFrame(self, pixelbuffer:list[str] = None) -> None:
+
+    def drawFrame(self, pixelbuffer:list[bool]|None = None, spritebuffer:dict[dict[tuple[int]]]|None = None) -> None:
         """Draw the pixelbuffer to screen
 
         Args:
@@ -43,6 +46,16 @@ class Graphics:
             usedPixelBuffer = self.pixelbuffer
         else:
             usedPixelBuffer = pixelbuffer
+        
+        if spritebuffer == None:
+            usedSpriteBuffer: dict[dict[tuple[int]]] = self.spriteBuffer
+        else:
+            usedSpriteBuffer: dict[dict[tuple[int]]] = spritebuffer
+        
+        
+        for filename in usedSpriteBuffer.keys():
+            for _,pos in usedSpriteBuffer[filename].items():
+                self.drawSprite(Graphics.genSpriteFromImage("sprites/"+filename), pos)
         
         
         out = []
@@ -92,22 +105,21 @@ class Graphics:
         for y in range(len(self.pixelbuffer)):
             self.pixelbuffer[y][x] = on
             
-    def drawSprite(self, sprite: Image.Image, x: int, y:int) -> None:
+    def drawSprite(self, sprite: Image.Image, pos: tuple[int]) -> None:
         """Draw a "sprite" to the specified position.
 
         Args:
             sprite (Image.Image): The sprite generated from Graphics.genSpriteFromImage
-            x (int): x-position
-            y (int): y-position
+            pos (tuple[int]): The position of the sprite. The origin is the top left.
         """
         
         dim = sprite.size
         px = sprite.load()
         
-        for cx in range(dim[1]):
-            for cy in range(dim[0]):
+        for cy in range(dim[1]):
+            for cx in range(dim[0]):
                 value = bool(round(sum(px[cx, cy])/3/256)) # Issue in here somewhere
-                self.drawPixel(cx+(x-dim[0]/2),cy+(y-dim[1]/2), value)
+                self.drawPixel(cx+pos[0], cy+pos[1], value) # If theres an error here, then thats because the image would go out of range of the screen
     
     def endDraw(self) -> None:
         os.system("clear")
@@ -127,6 +139,21 @@ class Graphics:
         im = Image.open(image_path)
         
         return im
+    
+    def addSprite(self, pos: tuple, filename: str, name: str):
+        """Add a sprite to the spritebuffer
+
+        Args:
+            pos (tuple): The position (x,y)
+            filename (str): The filename of the RGB image
+            name (str): The name of the sprite.
+        """
+        
+        if not filename in self.spriteBuffer.keys():
+            self.spriteBuffer[filename] = {}
+        
+        self.spriteBuffer[filename][name] = pos
+            
 
 
 if __name__ == "__main__":
