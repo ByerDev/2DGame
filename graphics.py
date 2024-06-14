@@ -174,6 +174,9 @@ class Graphics:
             name (str): The name of the sprite
         """
         del self.spriteBuffer[name]
+    
+    def getSpriteBuffer(self):
+        return self.spriteBuffer
 
 if __name__ == "__main__":
     print("THIS IS ONLY FOR DEBUGGING PURPOSES")
