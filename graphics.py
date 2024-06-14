@@ -69,8 +69,9 @@ class Graphics:
         self.drawColumn(0, True)
         self.drawColumn(self.window_resolution[0]-1, True)
         
-        os.system("clear")
+        #os.system("clear")
         sys.stdout.write("\n".join(out))
+        print()
     
     def drawPixel(self, x: int, y: int, on: bool) -> None:
         """Draw a Pixel at the specified coordinates
@@ -117,8 +118,8 @@ class Graphics:
         
         for cy in range(dim[1]):
             for cx in range(dim[0]):
-                value = bool(round(sum(px[cx, cy])/3/256)) # Issue in here somewhere
-                self.drawPixel(cx+pos[0], cy+pos[1], value) # If theres an error here, then thats because the image would go out of range of the screen
+                value = bool(round(sum(px[cx, cy])/3/256))
+                self.drawPixel(cx+pos[0]-round(dim[0]/2), cy+pos[1]-round(dim[1]/2), value) # If theres an error here, then thats because the image would go out of range of the screen
     
     def endDraw(self) -> None:
         os.system("clear")
@@ -186,6 +187,11 @@ class Graphics:
             name (str): the name
         """
         return self.spriteBuffer[name]
+    
+    def drawRect(self, pos1: tuple[int], pos2: tuple[int], on: bool = True):
+        for y in range(pos1[1], pos2[1]+1):
+            for x in range(pos1[0], pos2[0]+1):
+                self.drawPixel(x,y,on)
 
 if __name__ == "__main__":
     print("THIS IS ONLY FOR DEBUGGING PURPOSES")
