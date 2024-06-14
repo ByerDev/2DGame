@@ -17,7 +17,7 @@ class Graphics:
         
         self.window_resolution = [window_size,math.floor(window_size/2)] # Set the actual resolution with a 2:1 Aspect Ratio (because I said so)
         
-        self.spriteBuffer: dict[dict[tuple[int]]] = {} # A buffer for displaying sprites. Format {filename:[spritename:(x1,y1), spritename:(x2,y2), ...]}
+        self.spriteBuffer: dict[tuple[str, tuple[int]]] = {} # A buffer for displaying sprites. Format {name: (filename, pos)}
         
         self.pixelbuffer = []
         self.clearScreen()
@@ -53,10 +53,8 @@ class Graphics:
             usedSpriteBuffer: dict[dict[tuple[int]]] = spritebuffer
         
         
-        for filename in usedSpriteBuffer.keys():
-            for _,pos in usedSpriteBuffer[filename].items():
-                self.drawSprite(Graphics.genSpriteFromImage("sprites/"+filename), pos)
-        
+        for _, (filename, pos) in usedSpriteBuffer.items():
+            self.drawSprite(self.genSpriteFromImage(filename), pos)
         
         out = []
         for l in range(len(usedPixelBuffer)):
@@ -126,21 +124,25 @@ class Graphics:
         cursor.show()
     
     
-    def genSpriteFromImage(image_path: str) -> Image.Image:
-        """Generate a Sprite from an Image
+    def genSpriteFromImage(self=None, image_path: str = None) -> Image.Image:
+        """Generate a sprite from an image
 
         Args:
-            image_path (str): The path to the image
+            self (optional): for inside use. Defaults to None.
+            image_path (str, optional): The path to the image. Do NOT leave this empty, or else an error will be thrown. I've only made it optional to avoid the "Non-default argument follows default argument" error. (see stackoverflow.com/a/39942121) Defaults to None.
 
         Returns:
-            Image.Image: 
+            Image.Image: _description_
         """
         
-        im = Image.open(image_path)
+        if image_path == None:
+            raise(ValueError("image_path is None, which is not allowed. It is a non-default argument because: stackoverflow.)com/a/39942121"))
+        
+        im = Image.open("sprites/"+image_path)
         
         return im
     
-    def addSprite(self, pos: tuple, filename: str, name: str):
+    def addSprite(self, pos: tuple[int], filename: str, name: str) -> None:
         """Add a sprite to the spritebuffer
 
         Args:
@@ -149,12 +151,29 @@ class Graphics:
             name (str): The name of the sprite.
         """
         
-        if not filename in self.spriteBuffer.keys():
-            self.spriteBuffer[filename] = {}
-        
-        self.spriteBuffer[filename][name] = pos
-            
+        self.spriteBuffer[name] = (filename, pos)
+    
+    def editSprite(self, name: str, pos: tuple[int] = None, filename: str = None) -> None:
+        """A function for editing a sprites position and/or image
 
+        Args:
+            name (str): The name of the sprite (NOT the filename)
+            pos (tuple[int], optional): The position. Defaults to None.
+            filename (str, optional): The filename of the new Image. Defaults to None.
+        """
+        
+        if pos != None:
+            self.spriteBuffer[name][1] = pos
+        if filename != None:
+            self.spriteBuffer[name][0] = filename
+    
+    def deleteSprite(self, name: str) -> None:
+        """Delete a sprite
+
+        Args:
+            name (str): The name of the sprite
+        """
+        del self.spriteBuffer[name]
 
 if __name__ == "__main__":
     print("THIS IS ONLY FOR DEBUGGING PURPOSES")

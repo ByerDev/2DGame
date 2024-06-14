@@ -6,7 +6,7 @@ input()
 
 screen = Graphics(100)
 
-screen.addSprite((50,25), "enemy.png", "enemy1")
+screen.addSprite((25,25), "ship.png", "player")
 
 input() # Wait for user to adjust terminal
 
